@@ -9,46 +9,58 @@
 #   end
 require "faker"
 
-# Patient.destroy_all
-# Doctor.destroy_all
-# Appointement.destroy_all
+# réinitialiser les tables avant de créer des données en executant une commande dans le terminal
+# system("rails db:reset")
 
-# 50.times do |i|
-#     Patient.create!(
-#         first_name: Faker::Name.first_name,
-#         last_name: Faker::Name.last_name
-#     )
-#     Doctor.create!(
-#         first_name: Faker::Name.first_name,
-#         last_name: Faker::Name.last_name,
-#         speciality: Faker::Job.field,
-#         zip_code: Faker::Address.zip_code
-#     )
-# end
+# Création des 5 spécialités
+5.times do |i|
+    spe = ["cardiologue", "ophtalmologue", "urologue", "gynécologue", "médecin général"]
+    Speciality.create!(
+        name: spe[i]
+    )
+end
 
-# 400.times do |i|
-#     Appointment.create!(
-#         date: Faker::Date.between(from: 2.days.ago, to: Date.today),
-#         doctor_id: Doctor.all.sample.id,
-#         patient_id: Patient.all.sample.id
-#     )
-# end
+# Création de 10 villes
+10.times do |i|
+    City.create!(
+        name: Faker::Address.city,
+        zip: Faker::Address.zip_code
+    )
+end
 
-# 50.times do |i|
-#     City.create!(
-#         name: Faker::Address.city,
-#         zip: Faker::Address.zip_code
-#     )
-# end
+# Création de 50 patients et 50 médecins associés à une ville
+50.times do |i|
+    Patient.create!(
+        first_name: Faker::Name.first_name,
+        last_name: Faker::Name.last_name,
+        city_id: City.all.sample.id
+    )
+    Doctor.create!(
+        first_name: Faker::Name.first_name,
+        last_name: Faker::Name.last_name,
+        zip_code: Faker::Address.zip_code,
+        city_id: City.all.sample.id
+    )
+end
 
+# Association de quelques spécialités à nos médecins
+100.times do |i|
+    JoinTableDoctorsSpeciality.create!(
+        doctor_id: Doctor.all.sample.id,
+        speciality_id: Speciality.all.sample.id
+    )
+end
+
+# Création de pas beaucoup de rendez-vous
+# Ils sont tous malades ou quoi ?
 400.times do |i|
-    Doctor.all.sample.update!(
-        city_id: City.all.sample.id
-    )
-    Patient.all.sample.update!(
-        city_id: City.all.sample.id
-    )
-    Appointment.all.sample.update!(
-        city_id: City.all.sample.id
+    # Récupération d'une ville au hasard pour pouvoir sélectionner des médecins et des patients associés à cette ville
+    city = City.all.sample.id
+
+    Appointment.create!(
+        city_id: city,
+        date: Faker::Date.between(from: Date.today, to: 20.days.from_now),
+        doctor_id: Doctor.where(city_id: city).sample.id,
+        patient_id: Patient.where(city_id: city).sample.id
     )
 end
