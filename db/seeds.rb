@@ -28,8 +28,8 @@ end
     )
 end
 
-# Création de 50 patients et 50 médecins associés à une ville
-50.times do |i|
+# Création de 300 patients et 300 médecins associés à une ville
+300.times do |i|
     Patient.create!(
         first_name: Faker::Name.first_name,
         last_name: Faker::Name.last_name,
